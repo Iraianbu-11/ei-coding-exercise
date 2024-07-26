@@ -13,15 +13,15 @@ Singleton
 The central idea behind this design pattern is to ensure that only a single instance of a class
 is created in the entire application scope
 ## Solution
-[LazySingleton.java](exercise-1/creational-design-pattern/singleton/src/main/java/com/iraianbu/singleton/LazySingletonCache.java)
+[LazySingleton.java](/src/main/java/com/iraianbu/singleton/LazySingletonCache.java)
 
-[EagerSingleton.java](exercise-1/creational-design-pattern/singleton/src/main/java/com/iraianbu/singleton/EagerSingletonCache.java)
+[EagerSingleton.java](/src/main/java/com/iraianbu/singleton/EagerSingletonCache.java)
 
-[MultiThreadCache.java](exercise-1/creational-design-pattern/singleton/src/main/java/com/iraianbu/singleton/MultiThreadCache.java)
+[MultiThreadCache.java](/src/main/java/com/iraianbu/singleton/MultiThreadCache.java)
 
-[SerializableCache.java](exercise-1/creational-design-pattern/singleton/src/main/java/com/iraianbu/singleton/SerializableCache.java)
+[SerializableCache.java](/src/main/java/com/iraianbu/singleton/SerializableCache.java)
 
-[EnumSingletonCache.java](exercise-1/creational-design-pattern/singleton/src/main/java/com/iraianbu/singleton/EnumSingletonCache.java.java)
+[EnumSingletonCache.java](/src/main/java/com/iraianbu/singleton/EnumSingletonCache.java.java)
 ## Conclusion
 
 
