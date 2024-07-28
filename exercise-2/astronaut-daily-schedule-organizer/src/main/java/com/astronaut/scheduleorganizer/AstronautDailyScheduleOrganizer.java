@@ -22,13 +22,13 @@ public class AstronautDailyScheduleOrganizer {
     private static final ScheduleManager scheduleManager = ScheduleManager.getInstance();
     private static final UserInputHandler inputHandler = UserInputHandler.getInstance();
     private static final Scanner scanner = inputHandler.getScanner();
+    private static boolean continueRunning = true;
     private static final Logger log = LoggerFactory.getLogger(AstronautDailyScheduleOrganizer.class);
 
     public static void main(String[] args) {
         TaskConflictObserver observer = new TaskConflictObserver();
         scheduleManager.addObserver(observer);
-
-        while(true) {
+        while(continueRunning) {
             try {
                 showMenu();
                 int choice = getUserChoice();
@@ -42,6 +42,7 @@ public class AstronautDailyScheduleOrganizer {
     }
 
     private static void showMenu() {
+        System.out.println("\t\t\t\t\t\t\t\t\tAstronaut Daily Schedule Organizer");
         System.out.println("1. Add Task");
         System.out.println("2. Remove Task");
         System.out.println("3. View Tasks");
@@ -83,6 +84,7 @@ public class AstronautDailyScheduleOrganizer {
                 break;
             case 8:
                 log.info("Exiting application.");
+                continueRunning = false;
                 System.exit(0);
                 break;
             default:
@@ -128,7 +130,7 @@ public class AstronautDailyScheduleOrganizer {
     private static void editTask() {
         try {
             String taskType = getUserInput("Enter the task type: ").toUpperCase();
-            String description = getUserInput("Enter new description: ");
+            String description = getUserInput("Enter description: ");
             String newStartTime = getUserInput("Enter new start time: ");
             String newEndTime = getUserInput("Enter new end time: ");
             String newPriority = getUserInput("Enter new priority level: ");

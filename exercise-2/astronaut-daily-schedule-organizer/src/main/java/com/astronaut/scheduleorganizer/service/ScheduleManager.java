@@ -44,19 +44,6 @@ public class ScheduleManager {
         taskList.add(task);
         System.out.println("Task added successfully. No conflicts");
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
     public void editTask(Task taskRequest) throws TaskNotFoundException, TaskConflictException {
         Task oldTask = taskList.stream()
                 .filter(task -> task.getDescription().equals(taskRequest.getDescription()))
