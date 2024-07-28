@@ -6,8 +6,6 @@ import com.astronaut.scheduleorganizer.exception.TaskNotFoundException;
 import com.astronaut.scheduleorganizer.model.Task;
 import com.astronaut.scheduleorganizer.observer.Observer;
 import com.astronaut.scheduleorganizer.observer.ObserverManager;
-
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -17,7 +15,6 @@ public class ScheduleManager {
     private static ScheduleManager instance;
     private final List<Task> taskList;
     private final ObserverManager observerManager;
-
     private ScheduleManager() {
         taskList = new ArrayList<>();
         observerManager = new ObserverManager();
@@ -47,6 +44,18 @@ public class ScheduleManager {
         taskList.add(task);
         System.out.println("Task added successfully. No conflicts");
     }
+
+
+
+
+
+
+
+
+
+
+
+
 
     public void editTask(Task taskRequest) throws TaskNotFoundException, TaskConflictException {
         Task oldTask = taskList.stream()

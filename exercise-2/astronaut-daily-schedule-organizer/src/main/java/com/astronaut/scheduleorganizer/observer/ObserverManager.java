@@ -9,7 +9,6 @@ public class ObserverManager {
     public ObserverManager(){
         observers = new ArrayList<>();
     }
-
     public void addObserver(Observer observer){
         observers.add(observer);
     }
