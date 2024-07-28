@@ -3,9 +3,10 @@ package com.astronaut.scheduleorganizer;
 import com.astronaut.scheduleorganizer.exception.InvalidTimeFormatException;
 import com.astronaut.scheduleorganizer.exception.TaskConflictException;
 import com.astronaut.scheduleorganizer.exception.TaskNotFoundException;
+import com.astronaut.scheduleorganizer.factory.TaskFactory;
+import com.astronaut.scheduleorganizer.factory.TaskType;
 import com.astronaut.scheduleorganizer.handler.UserInputHandler;
 import com.astronaut.scheduleorganizer.model.Task;
-import com.astronaut.scheduleorganizer.model.TaskRequest;
 import com.astronaut.scheduleorganizer.service.ScheduleManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,7 +20,6 @@ public class AstronautDailyScheduleOrganizer {
     private static final UserInputHandler inputHandler = UserInputHandler.getInstance();
     private static final Scanner scanner = inputHandler.getScanner();
     private static final Logger log = LoggerFactory.getLogger(AstronautDailyScheduleOrganizer.class);
-
     public static void main(String[] args) throws TaskNotFoundException {
         boolean flag = true;
         while (flag) {
@@ -66,8 +66,9 @@ public class AstronautDailyScheduleOrganizer {
         }
     }
     private static void addTask(){
-
         try{
+            System.out.print("Enter the task type: ");
+            String taskType = scanner.nextLine().toUpperCase();
             System.out.print("Enter description: ");
             String description = scanner.nextLine();
             System.out.print("Enter start time: ");
@@ -77,14 +78,14 @@ public class AstronautDailyScheduleOrganizer {
             System.out.print("Enter priority: ");
             String priority = scanner.nextLine();
             if(isValidTime(startTime,endTime)) {
-                Task task = new Task(description, startTime, endTime, priority);
+                Task task = TaskFactory.createTask(TaskType.valueOf(taskType),description,startTime,endTime,priority);
                 scheduleManager.addTask(task);
                 log.info("Task added {}" , task.getDescription());
             }
         } catch (InvalidTimeFormatException | TaskConflictException e) {
+            log.error("Task not added {}", e.getMessage());
             System.out.println(e.getMessage());
         }
-
     }
 
     public static boolean isValidTime(String startTime, String endTime) throws InvalidTimeFormatException {
@@ -97,42 +98,65 @@ public class AstronautDailyScheduleOrganizer {
         }
     }
 
-    private static void editTask() throws TaskNotFoundException {
-
-        System.out.print("Enter description of task to edit: ");
-        String description = scanner.nextLine();
+    private static void editTask() {
+        System.out.print("Enter the task type: ");
+        String taskType = scanner.nextLine().toUpperCase();
         System.out.print("Enter new description: ");
-        String newDescription = scanner.nextLine();
+        String description = scanner.nextLine();
         System.out.print("Enter new start time: ");
         String newStartTime = scanner.nextLine();
         System.out.print("Enter new end time: ");
         String newEndTime = scanner.nextLine();
         System.out.print("Enter new priority level: ");
         String newPriority = scanner.nextLine();
-        TaskRequest taskRequest = new TaskRequest(description,newDescription,newStartTime,newEndTime,newPriority);
-        scheduleManager.editTask(taskRequest);
+        try{
+            Task task = TaskFactory.createTask(TaskType.valueOf(taskType),description,newStartTime,newEndTime,newPriority);
+            scheduleManager.editTask(task);
+            log.warn("Task edited successfully for {}" ,description);
+        }
+        catch (TaskNotFoundException | TaskConflictException e){
+            System.out.println(e.getMessage());
+            log.error("Task not edited {}" , description);
+        }
     }
 
     private static void removeTask() throws TaskNotFoundException {
         System.out.print("Enter description of task to remove: ");
         String description = scanner.nextLine();
-        scheduleManager.removeTask(description);
+        try{
+            scheduleManager.removeTask(description);
+            log.warn("Task removed {}", description);
+        }
+        catch (TaskNotFoundException e){
+            log.error(e.getMessage());
+        }
     }
 
     private static void viewCompletedTasks() {
-        scheduleManager.getCompletedTasks().forEach(System.out::println);
+        List<String> completedTasks = scheduleManager.getCompletedTasks();
+        if(completedTasks.isEmpty()){
+            System.out.println("No task completed yet");
+            return;
+        }
+        completedTasks.forEach(System.out::println);
     }
 
     private static void markTaskAsCompleted() throws TaskNotFoundException {
         System.out.print("Enter description of task: ");
         String description = scanner.nextLine();
         scheduleManager.markTaskAsCompleted(description);
+        log.info("Task completed {}" , description);
     }
 
     private static void viewTasksByPriority() {
         System.out.print("Enter priority level: ");
         String priority = scanner.nextLine();
-        scheduleManager.getTasksByPriority(priority).forEach(System.out::println);
+        List<String> tasksByPriority = scheduleManager.getTasksByPriority(priority);
+       if(tasksByPriority.isEmpty()){
+           System.out.println("No tasks found");
+           return;
+       }
+       tasksByPriority.forEach(System.out::println);
     }
 
     private static void viewTasks() {
@@ -144,38 +168,3 @@ public class AstronautDailyScheduleOrganizer {
         tasks.forEach(System.out::println);
     }
 }
-/***
- *   MDC.put("user","admin");
- *         Logger logger = LoggerFactory.getLogger(AstronautDailyScheduleOrganizer.class);
- *         logger.info("Hello World");
- *
- *        try{
- *            performTask();
- *        }
- *        catch (InvalidTimeFormatException e){
- *            logger.error(e.getMessage());
- *        }
- *     }
- *
- *     private static void performTask() throws InvalidTimeFormatException{
- *         if(true){
- *             throw new InvalidTimeFormatException("Error: Invalid time format");
- *         }
- *         ScheduleManager scheduleManager = ScheduleManager.getInstance();
- *             Task task1 = new Task("Team Meeting", "09:00", "10:00", "High");
- *             Task task2 = new Task("Overlap Task", "08:02", "09:00", "High");
- *             Task task3 = new Task("New Task","07:00","08:02","Low");
- *             scheduleManager.addTask(task1);
- *             scheduleManager.addTask(task2);
- *             scheduleManager.addTask(task3);
- *             scheduleManager.getTasks().forEach(System.out::println);
- *             System.out.println();
- *             scheduleManager.editTask(new TaskRequest(
- *                     "Team Meeting","New Meeting","11:00","13:00","High"
- *             ));
- *             //scheduleManager.getTasks().forEach(System.out::println);
- *             scheduleManager.markTaskAsCompleted("Overlap Task");
- *             //scheduleManager.getTasksByPriority("High").forEach(System.out::println);
- *             scheduleManager.getCompletedTasks().forEach(System.out::println);
- *             //scheduleManager.getTasks().forEach(System.out::println);
- */

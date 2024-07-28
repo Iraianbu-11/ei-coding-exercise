@@ -6,7 +6,6 @@ import java.util.List;
 
 public class ObserverManager {
     private List<Observer> observers;
-
     public ObserverManager(){
         observers = new ArrayList<>();
     }
