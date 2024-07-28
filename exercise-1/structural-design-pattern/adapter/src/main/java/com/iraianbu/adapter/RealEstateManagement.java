@@ -20,4 +20,8 @@ public class RealEstateManagement {
     public void addProperty(Property property){
         propertyList.add(property);
     }
+
+    public void deleteProperty(Property property){
+        propertyList.remove(property);
+    }
 }
