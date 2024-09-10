@@ -4,7 +4,6 @@ import com.astronaut.scheduleorganizer.exception.InvalidTimeFormatException;
 import com.astronaut.scheduleorganizer.exception.TaskConflictException;
 import com.astronaut.scheduleorganizer.exception.TaskNotFoundException;
 import com.astronaut.scheduleorganizer.factory.TaskFactory;
-import com.astronaut.scheduleorganizer.factory.TaskType;
 import com.astronaut.scheduleorganizer.handler.UserInputHandler;
 import com.astronaut.scheduleorganizer.model.Task;
 import com.astronaut.scheduleorganizer.observer.TaskConflictObserver;
@@ -13,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -57,7 +57,6 @@ public class AstronautDailyScheduleOrganizer {
     private static int getUserChoice() {
         return scanner.nextInt();
     }
-
     private static void handleUserChoice(int choice) {
         scanner.nextLine();
         switch (choice) {
@@ -92,17 +91,15 @@ public class AstronautDailyScheduleOrganizer {
                 break;
         }
     }
-
     private static void addTask() {
         try {
-            String taskType = getUserInput("Enter the task type: ").toUpperCase();
             String description = getUserInput("Enter description: ");
             String startTime = getUserInput("Enter start time: ");
             String endTime = getUserInput("Enter end time: ");
             String priority = getUserInput("Enter priority: ");
 
             if (isValidTime(startTime, endTime)) {
-                Task task = TaskFactory.createTask(TaskType.valueOf(taskType), description, startTime, endTime, priority);
+                Task task = TaskFactory.createTask( description, startTime, endTime, priority);
                 scheduleManager.addTask(task);
                 log.info("Task added: {}", task.getDescription());
             }
@@ -118,24 +115,25 @@ public class AstronautDailyScheduleOrganizer {
     }
 
     private static boolean isValidTime(String startTime, String endTime) throws InvalidTimeFormatException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HHmm");
         try {
-            LocalTime.parse(startTime);
-            LocalTime.parse(endTime);
+            LocalTime.parse(startTime, formatter);
+            LocalTime.parse(endTime, formatter);
             return true;
         } catch (DateTimeParseException e) {
-            throw new InvalidTimeFormatException("Error: Invalid time format");
+            throw new InvalidTimeFormatException("Invalid Time Format");
         }
     }
 
     private static void editTask() {
         try {
-            String taskType = getUserInput("Enter the task type: ").toUpperCase();
+
             String description = getUserInput("Enter description: ");
             String newStartTime = getUserInput("Enter new start time: ");
             String newEndTime = getUserInput("Enter new end time: ");
             String newPriority = getUserInput("Enter new priority level: ");
 
-            Task task = TaskFactory.createTask(TaskType.valueOf(taskType), description, newStartTime, newEndTime, newPriority);
+            Task task = TaskFactory.createTask(description, newStartTime, newEndTime, newPriority);
             scheduleManager.editTask(task);
             log.info("Task edited successfully: {}", description);
         } catch (TaskNotFoundException | TaskConflictException | IllegalArgumentException e) {
@@ -184,7 +182,6 @@ public class AstronautDailyScheduleOrganizer {
             tasksByPriority.forEach(System.out::println);
         }
     }
-
     private static void viewTasks() {
         List<String> tasks = scheduleManager.getTasks();
         if (tasks.isEmpty()) {

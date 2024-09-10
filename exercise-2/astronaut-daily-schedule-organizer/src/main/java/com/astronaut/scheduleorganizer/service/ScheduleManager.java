@@ -9,6 +9,7 @@ import com.astronaut.scheduleorganizer.observer.ObserverManager;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.stream.Collectors;
 
 public class ScheduleManager {
@@ -87,12 +88,33 @@ public class ScheduleManager {
     }
 
     public void removeTask(String description) throws TaskNotFoundException {
-        Task oldTask = taskList.stream()
+        List<Task> tasksToRemove = taskList.stream()
                 .filter(task -> task.getDescription().equals(description))
-                .findFirst()
-                .orElseThrow(() -> new TaskNotFoundException("Task not found"));
-        System.out.println("Task removed successfully");
-        taskList.remove(oldTask);
+                .collect(Collectors.toList());
+
+        if (tasksToRemove.isEmpty()) {
+            throw new TaskNotFoundException("Task not found");
+        } else if (tasksToRemove.size() == 1) {
+            taskList.remove(tasksToRemove.get(0));
+            System.out.println("Task removed successfully");
+        } else {
+            Scanner scanner = new Scanner(System.in);
+            System.out.println("Multiple tasks founded: " + description);
+            for (int i = 0; i < tasksToRemove.size(); i++) {
+                Task task = tasksToRemove.get(i);
+                System.out.println((i + 1) + ": " + task.getStartTime() + " - " + task.getEndTime());
+            }
+            System.out.print("Enter the no of the task you want to remove: ");
+            int taskNumber = scanner.nextInt();
+
+            if (taskNumber > 0 && taskNumber <= tasksToRemove.size()) {
+                Task selectedTask = tasksToRemove.get(taskNumber - 1);
+                taskList.remove(selectedTask);
+                System.out.println("Task removed successfully");
+            } else {
+                System.out.println("Invalid selection. No task removed.");
+            }
+        }
     }
 
     public List<String> getTasks() {
@@ -110,8 +132,9 @@ public class ScheduleManager {
         observerManager.removeObserver(observer);
     }
 
-    private boolean isTimeConflict(Task task1, Task task2) {
-        return task1.getStartTime().isBefore(task2.getEndTime()) && task1.getEndTime().isAfter(task2.getStartTime());
+    private boolean isTimeConflict(Task existingTask, Task newTask) {
+        return existingTask.getStartTime().isBefore(newTask.getEndTime()) &&
+                newTask.getStartTime().isBefore(existingTask.getEndTime());
     }
 
 }
